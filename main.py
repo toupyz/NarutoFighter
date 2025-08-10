@@ -14,6 +14,11 @@ pygame.display.set_caption("Naruto Fighter") #Screen title
 clock = pygame.time.Clock()
 FPS = 60
 
+#Define colours
+RED = (255,0,0)
+WHITE = (255,255,255)
+BLACK = (0,0,0)
+
 #Load background image
 bg_image = pygame.image.load("assets/images/background/konoha.png").convert_alpha()
 
@@ -22,10 +27,17 @@ def draw_bg():
     scaled_bg = pygame.transform.scale(bg_image, (SCREEN_WIDTH,SCREEN_HEIGHT))
     screen.blit(scaled_bg, (0, 0))
 
+#Funcions for drawing fighter's health bar
+def draw_health_bar(health, x ,y):
+    ratio = health / 100
+    pygame.draw.rect(screen, BLACK, (x-2, y-2, 404, 34)) #rectangle outline
+    pygame.draw.rect(screen, WHITE, (x, y, 400, 30)) #rectangle bottom layer of health bar
+    pygame.draw.rect(screen, RED, (x, y, 400 * ratio, 30)) #rectangle top layer of health bar
+
+
 #Create two instances of fighters
 fighter_1 = Fighter(300,620)
 fighter_2 = Fighter(1100, 620)
-
 
 
 #Game loop
@@ -35,9 +47,12 @@ while run:
 
     #Draw background
     draw_bg()
+    #Show player's stats
+    draw_health_bar(fighter_1.health, 100 , 50)
+    draw_health_bar(fighter_2.health, 900 , 50)
 
     #Move fighters
-    fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT)
+    fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2)
     #fighter_2.move()
 
     #Draw fighters

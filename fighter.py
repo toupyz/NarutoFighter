@@ -2,27 +2,46 @@ import pygame
 
 class Fighter():
     def __init__(self, x, y):
+        self.flip = False
         self.rect = pygame.Rect((x,y, 80, 180))
         self.vel_y = 0 #y velocity
         self.jump = False
+        self.attacking = False
+        self.attack_type = 0
+        self.health = 100
 
 
-    def move(self, screen_width, screen_height):
+    def move(self, screen_width, screen_height, surface, target):
         SPEED = 10
         GRAVITY = 2
         dx = 0 #Change in x coordinate
         dy = 0 #Change in y coordinate
         key = pygame.key.get_pressed() #Get key presses
 
-        #Movement
-        if key[pygame.K_a]:
-            dx = -SPEED
-        if key[pygame.K_d]:
-            dx = SPEED
-        #Jumping
-        if key[pygame.K_w] and self.jump == False:
-            self.vel_y = -30 #Negative in y will go up
-            self.jump = True
+        #Will attack when the following is not performed
+        if self.attacking == False:
+            #Movement
+            if key[pygame.K_a]:
+                dx = -SPEED
+            if key[pygame.K_d]:
+                dx = SPEED
+
+            #Jumping
+            if key[pygame.K_w] and self.jump == False:
+                self.vel_y = -30 #Negative in y will go up
+                self.jump = True
+
+            #Attack
+            if key[pygame.K_e] or key[pygame.K_r]:
+                self.attack(surface, target)
+                #Determine what attack is used
+                if key[pygame.K_e]:
+                    self.attack_type = 1
+                if key[pygame.K_r]:
+                    self.attack_type = 2
+
+
+        #Apply gravity
         self.vel_y += GRAVITY
         dy += self.vel_y
 
@@ -36,11 +55,32 @@ class Fighter():
             self.jump = False
             dy = screen_height - 100 - self.rect.bottom
 
+        #Ensures players face each other
+        if target.rect.centerx > self.rect.centerx:
+            self.flip = False
+        else:
+            self.flip = True
+
         #Update player position
         self.rect.x += dx
         self.rect.y += dy
 
 
 
+    def attack(self, surface, target):
+        self.attacking = True
+        attacking_rect = pygame.Rect(self.rect.centerx - (2 * self.rect.width * self.flip), self.rect.y, 2 * self.rect.width, self.rect.height)
+        if attacking_rect.colliderect(target.rect):
+            target.health -= 10
+            print("Attacking")
+
+        pygame.draw.rect(surface, (0,255,255), attacking_rect)
+
+
+
+
     def draw(self, surface):
         pygame.draw.rect(surface, (255,0,0), self.rect)
+
+
+
