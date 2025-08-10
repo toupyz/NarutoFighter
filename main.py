@@ -5,10 +5,14 @@ pygame.init()
 
 #Create game window
 SCREEN_WIDTH = 1400
-SCREEN_HEIGHT = 800
+SCREEN_HEIGHT = 900
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption("Naruto Fighter") #Screen title
+
+#Set frame rate
+clock = pygame.time.Clock()
+FPS = 60
 
 #Load background image
 bg_image = pygame.image.load("assets/images/background/konoha.png").convert_alpha()
@@ -19,16 +23,22 @@ def draw_bg():
     screen.blit(scaled_bg, (0, 0))
 
 #Create two instances of fighters
-fighter_1 = Fighter(300,510)
-fighter_2 = Fighter(1100, 510)
+fighter_1 = Fighter(300,620)
+fighter_2 = Fighter(1100, 620)
 
 
 
 #Game loop
 run = True
 while run:
+    clock.tick(FPS)
+
     #Draw background
     draw_bg()
+
+    #Move fighters
+    fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT)
+    #fighter_2.move()
 
     #Draw fighters
     fighter_1.draw(screen)
