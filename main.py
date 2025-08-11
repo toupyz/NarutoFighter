@@ -20,7 +20,7 @@ WHITE = (255,255,255)
 BLACK = (0,0,0)
 
 #Define fighter varibles
-NARUTO_SIZE = 70
+NARUTO_SIZE = 76
 NARUTO_SCALE = 3
 NARUTO_OFFSET = [20, 0]
 NARUTO_DATA = [NARUTO_SIZE, NARUTO_SCALE, NARUTO_OFFSET]
@@ -37,7 +37,7 @@ naruto_sheet = pygame.image.load("assets/images/naruto/naruto.png").convert_alph
 sasuke_sheet = pygame.image.load("assets/images/sasuke/sasuke.png").convert_alpha()
 
 #Define number of steps in each animation
-NARUTO_ANIMATED_STEPS = [4,6,6]
+NARUTO_ANIMATED_STEPS = [4,6,4,9,6]
 SASUKE_ANIMATED_STEPS = [4,6,6]
 
 #Function for drawing background
@@ -70,6 +70,10 @@ while run:
     #Move fighters
     fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2)
     #fighter_2.move()
+
+    #Update fighters
+    fighter_1.update()
+    fighter_2.update()
 
     #Draw fighters
     fighter_1.draw(screen)

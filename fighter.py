@@ -10,8 +10,10 @@ class Fighter():
         self.action = 0 #0=idle, 1=run, 2=jump, 3=punch, 4=throwing, 5=hit, 6=death
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
+        self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect((x,y, 80, 180))
         self.vel_y = 0 #y velocity
+        self.running = False
         self.jump = False
         self.attacking = False
         self.attack_type = 0
@@ -33,15 +35,17 @@ class Fighter():
         GRAVITY = 2
         dx = 0 #Change in x coordinate
         dy = 0 #Change in y coordinate
+        self.running = False
         key = pygame.key.get_pressed() #Get key presses
-
         #Will attack when the following is not performed
         if self.attacking == False:
             #Movement
             if key[pygame.K_a]:
                 dx = -SPEED
+                self.running = True
             if key[pygame.K_d]:
                 dx = SPEED
+                self.running = True
 
             #Jumping
             if key[pygame.K_w] and self.jump == False:
@@ -82,6 +86,26 @@ class Fighter():
         self.rect.x += dx
         self.rect.y += dy
 
+    #Define animation updates
+    def update(self):
+        #Check what action the player is performing
+        if self.jump == True:
+            self.update_action(2)
+        elif self.running == True:
+            self.update_action(1)
+        else:
+            self.update_action(0)
+
+        animation_cooldown = 50 #miliseconds
+        self.image = self.animation_list[self.action][self.frame_index]
+        #Check if enough time has passes since the last update
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            self.frame_index += 1
+            self.update_time = pygame.time.get_ticks()
+        #Check if the animtion if finished
+        if self.frame_index >= len(self.animation_list[self.action]):
+            self.frame_index = 0
+
 
 
     def attack(self, surface, target):
@@ -94,6 +118,13 @@ class Fighter():
         pygame.draw.rect(surface, (0,255,255), attacking_rect)
 
 
+    def update_action(self, new_action):
+        #Check if the new action is different to the previous one
+        if new_action != self.action:
+            self.action = new_action
+            #Update the animation settings
+            self.frame_index = 0
+            self.update_time = pygame.time.get_ticks()
 
 
     def draw(self, surface):
