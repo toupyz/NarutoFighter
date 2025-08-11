@@ -19,8 +19,26 @@ RED = (255,0,0)
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
+#Define fighter varibles
+NARUTO_SIZE = 70
+NARUTO_SCALE = 3
+NARUTO_OFFSET = [20, 0]
+NARUTO_DATA = [NARUTO_SIZE, NARUTO_SCALE, NARUTO_OFFSET]
+SASUKE_SIZE = 70
+SASUKE_SCALE = 3
+SASUKE_OFFSET = [20, 0]
+SASUKE_DATA = [SASUKE_SIZE, SASUKE_SCALE, SASUKE_OFFSET]
+
 #Load background image
 bg_image = pygame.image.load("assets/images/background/konoha.png").convert_alpha()
+
+#Load spritesheets
+naruto_sheet = pygame.image.load("assets/images/naruto/naruto.png").convert_alpha()
+sasuke_sheet = pygame.image.load("assets/images/sasuke/sasuke.png").convert_alpha()
+
+#Define number of steps in each animation
+NARUTO_ANIMATED_STEPS = [4,6,6]
+SASUKE_ANIMATED_STEPS = [4,6,6]
 
 #Function for drawing background
 def draw_bg():
@@ -34,11 +52,9 @@ def draw_health_bar(health, x ,y):
     pygame.draw.rect(screen, WHITE, (x, y, 400, 30)) #rectangle bottom layer of health bar
     pygame.draw.rect(screen, RED, (x, y, 400 * ratio, 30)) #rectangle top layer of health bar
 
-
 #Create two instances of fighters
-fighter_1 = Fighter(300,620)
-fighter_2 = Fighter(1100, 620)
-
+fighter_1 = Fighter(300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS)
+fighter_2 = Fighter(1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS)
 
 #Game loop
 run = True
