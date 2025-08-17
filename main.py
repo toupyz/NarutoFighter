@@ -44,6 +44,8 @@ pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1, 0.0, 5000)
 punch_fx = pygame.mixer.Sound("assets/audio/punch.wav")
 punch_fx.set_volume(0.2)
+kunai_fx = pygame.mixer.Sound("assets/audio/kunai.wav")
+kunai_fx.set_volume(0.2)
 
 #Load background image
 bg_image = pygame.image.load("assets/images/background/konoha.png").convert_alpha()
@@ -75,8 +77,8 @@ def draw_health_bar(health, x ,y):
     pygame.draw.rect(screen, RED, (x, y, 400 * ratio, 30)) #rectangle top layer of health bar
 
 #Create two instances of fighters
-fighter_1 = Fighter(1, 300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS, punch_fx)
-fighter_2 = Fighter(2, 1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS, punch_fx)
+fighter_1 = Fighter(1, 300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS, punch_fx, kunai_fx)
+fighter_2 = Fighter(2, 1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS, punch_fx, kunai_fx)
 
 #Game loop
 run = True
@@ -128,8 +130,8 @@ while run:
         if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
             round_over = False
             intro_count = 3
-            fighter_1 = Fighter(1, 300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS, punch_fx)
-            fighter_2 = Fighter(2, 1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS, punch_fx)
+            fighter_1 = Fighter(1, 300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS, punch_fx, kunai_fx)
+            fighter_2 = Fighter(2, 1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS, punch_fx, kunai_fx)
 
     #Event handler
     for event in pygame.event.get():

@@ -4,7 +4,7 @@ kunai_img = pygame.image.load("assets/images/kunai.png")
 kunai_img = pygame.transform.scale(kunai_img, (50, 20))  # resize to fit your game
 
 class Fighter():
-    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, sound):
+    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, punch_sound, kunai_sound):
         self.player = player
         self.size = data[0]
         self.image_scale = data[1]
@@ -22,9 +22,10 @@ class Fighter():
         self.attacking = False
         self.attack_type = 0
         self.attack_cooldown = 0
-        self.attack_sound = sound
+        self.punch_sound = punch_sound
+        self.kunai_sound = kunai_sound
         self.hit = False
-        self.health = 10
+        self.health = 100
         self.alive = True
         self.projectiles = []
 
@@ -174,9 +175,9 @@ class Fighter():
     def attack(self, surface, target, kunai_img=None):
         if self.attack_cooldown == 0:
             self.attacking = True
-            self.attack_sound.play()
 
             if self.attack_type == 1:  # Punch
+                self.punch_sound.play()
                 attack_width = self.rect.width // 2
                 attack_height = self.rect.height
                 if self.flip:  # Facing left
@@ -190,6 +191,7 @@ class Fighter():
                     target.hit = True
 
             elif self.attack_type == 2 and kunai_img:
+                self.kunai_sound.play()
                 direction = -1 if self.flip else 1
                 start_x = self.rect.centerx + (30 * direction)
                 start_y = self.rect.centery
