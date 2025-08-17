@@ -1,5 +1,8 @@
 import pygame
 
+kunai_img = pygame.image.load("assets/images/kunai.png")
+kunai_img = pygame.transform.scale(kunai_img, (50, 20))  # resize to fit your game
+
 class Fighter():
     def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, sound):
         self.player = player
@@ -23,6 +26,8 @@ class Fighter():
         self.hit = False
         self.health = 10
         self.alive = True
+        self.projectiles = []
+
 
     def load_images(self, sprite_sheet, animation_steps):
         #Extract images from spritesheets
@@ -61,12 +66,13 @@ class Fighter():
                     self.jump = True
                 #Attack
                 if key[pygame.K_e] or key[pygame.K_f]:
-                    self.attack(surface, target)
                     #Determine what attack is used
                     if key[pygame.K_e]:
                         self.attack_type = 1
                     if key[pygame.K_f]:
                         self.attack_type = 2
+                    self.attack(surface, target, kunai_img)
+
             if self.player == 2: #Player 2
                 #Movement
                 if key[pygame.K_j]:
@@ -87,6 +93,8 @@ class Fighter():
                         self.attack_type = 1
                     if key[pygame.K_h]:
                         self.attack_type = 2
+                    self.attack(surface, target, kunai_img)
+
 
 
         #Apply gravity
@@ -163,25 +171,38 @@ class Fighter():
                     self.attack_cooldown = 25
 
 
-    def attack(self, surface, target):
+    def attack(self, surface, target, kunai_img=None):
         if self.attack_cooldown == 0:
             self.attacking = True
             self.attack_sound.play()
-            # Attack hitbox size
-            attack_width = self.rect.width // 2
-            attack_height = self.rect.height
-            if self.flip:  # Facing left
-                attack_x = self.rect.left - attack_width
-            else:          # Facing right
-                attack_x = self.rect.right
-            attack_y = self.rect.y
-            attacking_rect = pygame.Rect(attack_x, attack_y, attack_width, attack_height)
-            # Collision check
-            if attacking_rect.colliderect(target.rect):
-                target.health -= 10
-                target.hit = True
-                print("Hit!")
+
+            if self.attack_type == 1:  # Punch
+                attack_width = self.rect.width // 2
+                attack_height = self.rect.height
+                if self.flip:  # Facing left
+                    attack_x = self.rect.left - attack_width
+                else:          # Facing right
+                    attack_x = self.rect.right
+                attack_y = self.rect.y
+                attacking_rect = pygame.Rect(attack_x, attack_y, attack_width, attack_height)
+                if attacking_rect.colliderect(target.rect):
+                    target.health -= 10
+                    target.hit = True
+
+            elif self.attack_type == 2 and kunai_img:
+                direction = -1 if self.flip else 1
+                start_x = self.rect.centerx + (30 * direction)
+                start_y = self.rect.centery
+                kunai = Projectile(start_x, start_y, direction, kunai_img)
+                self.projectiles.append(kunai)
+
             #pygame.draw.rect(surface, (0, 255, 255), attacking_rect) #Attack hitbox
+        
+    def update_projectiles(self, screen, target):
+        for kunai in self.projectiles:
+            kunai.update(screen, target)
+        # Keep only alive kunai
+        self.projectiles = [k for k in self.projectiles if k.alive]
 
 
 
@@ -201,3 +222,36 @@ class Fighter():
 
 
 
+class Projectile():
+    def __init__(self, x, y, direction, image):
+        self.image_original = image
+        # Flip image if direction is left
+        if direction == -1:
+            self.image = pygame.transform.flip(image, True, False)
+        else:
+            self.image = image
+        self.rect = self.image.get_rect(center=(x, y))
+        self.direction = direction
+        # Physics
+        self.vel_x = 12 * direction
+        self.vel_y = -10   # initial upward arc -10
+        self.gravity = 0.5
+        self.alive = True
+
+    def update(self, screen, target):
+        # Apply physics
+        self.rect.x += self.vel_x
+        self.rect.y += self.vel_y
+        self.vel_y += self.gravity
+        # Draw
+        screen.blit(self.image, self.rect)
+        # Check hit
+        if self.rect.colliderect(target.rect):
+            target.health -= 5 #Damage
+            target.hit = True
+            self.alive = False
+        # Remove if off-screen
+        if (self.rect.top > screen.get_height() or 
+            self.rect.right < 0 or 
+            self.rect.left > screen.get_width()):
+            self.alive = False

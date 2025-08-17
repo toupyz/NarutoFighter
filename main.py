@@ -40,10 +40,10 @@ SASUKE_DATA = [SASUKE_SIZE, SASUKE_SCALE, SASUKE_OFFSET]
 
 #Load music/sounds
 pygame.mixer.music.load("assets/audio/silhouette.mp3")
-pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1, 0.0, 5000)
 punch_fx = pygame.mixer.Sound("assets/audio/punch.wav")
-punch_fx.set_volume(0.5)
+punch_fx.set_volume(0.2)
 
 #Load background image
 bg_image = pygame.image.load("assets/images/background/konoha.png").convert_alpha()
@@ -54,8 +54,8 @@ sasuke_sheet = pygame.image.load("assets/images/sasuke/sasuke.png").convert_alph
 NARUTO_ANIMATED_STEPS = [4,6,4,3,3,3,14]
 SASUKE_ANIMATED_STEPS = [4,6,4,3,3,2,12]
 #Define fonts
-count_font = pygame.font.Font("assets/fonts/pixelifySans.ttf", 80)
-score_font = pygame.font.Font("assets/fonts/pixelifySans.ttf", 30)
+count_font = pygame.font.Font("assets/fonts/squbitzplus.ttf", 100)
+score_font = pygame.font.Font("assets/fonts/squbitzplus.ttf", 40)
 
 #Function for drawing text
 def draw_text(text, font, text_colour, x, y):
@@ -107,6 +107,8 @@ while run:
     #Update fighters
     fighter_1.update()
     fighter_2.update()
+    fighter_1.update_projectiles(screen, fighter_2)
+    fighter_2.update_projectiles(screen, fighter_1)
 
     #Draw fighters
     fighter_1.draw(screen)
