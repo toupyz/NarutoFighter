@@ -1,33 +1,44 @@
 import pygame
+import json
 
 kunai_img = pygame.image.load("assets/images/kunai.png")
 kunai_img = pygame.transform.scale(kunai_img, (50, 20))  # resize to fit your game
 
+with open("characters.json", "r") as file:
+    character_data = json.load(file)
+
 class Fighter():
-    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, punch_sound, kunai_sound):
-        self.player = player
-        self.size = data[0]
-        self.image_scale = data[1]
-        self.offset = data[2]
-        self.flip = flip
-        self.animation_list = self.load_images(sprite_sheet, animation_steps)
-        self.action = 0 #0=idle, 1=run, 2=jump, 3=punch, 4=throwing, 5=hit, 6=death
-        self.frame_index = 0
-        self.image = self.animation_list[self.action][self.frame_index]
-        self.update_time = pygame.time.get_ticks()
-        self.rect = pygame.Rect((x,y, 80, 180))
-        self.vel_y = 0 #y velocity
-        self.running = False
-        self.jump = False
+    def __init__(self, char_id, player, x, y, flip, punch_sound, kunai_sound):
+        self.char_id = char_id
+        self.data = character_data[char_id]
+
+        self.alive = True
+        self.action = 0  # 0=idle, 1=run, 2=jump, 3=punch, 4=throwing, 5=hit, 6=death
+        self.attack_cooldown = 0
         self.attacking = False
         self.attack_type = 0
-        self.attack_cooldown = 0
-        self.punch_sound = punch_sound
-        self.kunai_sound = kunai_sound
+        self.flip = flip
+        self.frame_index = 0
+        self.health = self.data["health"]
         self.hit = False
-        self.health = 100
-        self.alive = True
+        self.size = self.data["size"]
+        self.image_scale = self.data["scale"]
+        self.offset = self.data["offset"]
+        sprite_sheet = pygame.image.load(self.data["sprite_sheet"]).convert_alpha()
+        self.animation_list = self.load_images(sprite_sheet, self.data["animation_steps"])
+        self.image = self.animation_list[self.action][self.frame_index]
+        self.jump = False
+        self.kunai_sound = kunai_sound
+        self.player = player 
         self.projectiles = []
+        self.punch_sound = punch_sound
+        self.punch_damage = self.data["punch_damage"]
+        self.throw_damage = self.data["throw_damage"]
+        self.rect = pygame.Rect((x, y, 80, 180))
+        self.running = False
+        self.update_time = pygame.time.get_ticks()
+        self.vel_y = 0  # y velocity
+
 
 
     def load_images(self, sprite_sheet, animation_steps):
@@ -187,7 +198,7 @@ class Fighter():
                 attack_y = self.rect.y
                 attacking_rect = pygame.Rect(attack_x, attack_y, attack_width, attack_height)
                 if attacking_rect.colliderect(target.rect):
-                    target.health -= 10
+                    target.health -= self.punch_damage
                     target.hit = True
 
             elif self.attack_type == 2 and kunai_img:
@@ -195,8 +206,9 @@ class Fighter():
                 direction = -1 if self.flip else 1
                 start_x = self.rect.centerx + (30 * direction)
                 start_y = self.rect.centery
-                kunai = Projectile(start_x, start_y, direction, kunai_img)
+                kunai = Projectile(start_x, start_y, direction, kunai_img, self.throw_damage)
                 self.projectiles.append(kunai)
+
 
             #pygame.draw.rect(surface, (0, 255, 255), attacking_rect) #Attack hitbox
         
@@ -225,7 +237,7 @@ class Fighter():
 
 
 class Projectile():
-    def __init__(self, x, y, direction, image):
+    def __init__(self, x, y, direction, image, throw_damage):
         self.image_original = image
         # Flip image if direction is left
         if direction == -1:
@@ -239,6 +251,7 @@ class Projectile():
         self.vel_y = -10   # initial upward arc -10
         self.gravity = 0.5
         self.alive = True
+        self.throw_damage = throw_damage
 
     def update(self, screen, target):
         # Apply physics
@@ -249,7 +262,7 @@ class Projectile():
         screen.blit(self.image, self.rect)
         # Check hit
         if self.rect.colliderect(target.rect):
-            target.health -= 5 #Damage
+            target.health -= self.throw_damage #Damage
             target.hit = True
             self.alive = False
         # Remove if off-screen

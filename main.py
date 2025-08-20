@@ -10,7 +10,7 @@ SCREEN_WIDTH = 1400
 SCREEN_HEIGHT = 900
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-pygame.display.set_caption("Naruto Fighter") #Screen title
+pygame.display.set_caption("Ninja Clash") #Screen title
 
 #Set frame rate
 clock = pygame.time.Clock()
@@ -28,16 +28,6 @@ score = [0,0] #Player scores: [player1, player2
 round_over = False
 ROUND_OVER_COOLDOWN = 2000 #2 seconds
 
-#Define fighter varibles
-NARUTO_SIZE = 162
-NARUTO_SCALE = 3
-NARUTO_OFFSET = [70, 39]
-NARUTO_DATA = [NARUTO_SIZE, NARUTO_SCALE, NARUTO_OFFSET]
-SASUKE_SIZE = 162
-SASUKE_SCALE = 3
-SASUKE_OFFSET = [70, 39]
-SASUKE_DATA = [SASUKE_SIZE, SASUKE_SCALE, SASUKE_OFFSET]
-
 #Load music/sounds
 pygame.mixer.music.load("assets/audio/silhouette.mp3")
 pygame.mixer.music.set_volume(0.2)
@@ -49,12 +39,7 @@ kunai_fx.set_volume(0.2)
 
 #Load background image
 bg_image = pygame.image.load("assets/images/background/konoha.png").convert_alpha()
-#Load spritesheets
-naruto_sheet = pygame.image.load("assets/images/naruto/naruto.png").convert_alpha()
-sasuke_sheet = pygame.image.load("assets/images/sasuke/sasuke.png").convert_alpha()
-#Define number of steps in each animation
-NARUTO_ANIMATED_STEPS = [4,6,4,3,3,3,14]
-SASUKE_ANIMATED_STEPS = [4,6,4,3,3,2,12]
+
 #Define fonts
 count_font = pygame.font.Font("assets/fonts/squbitzplus.ttf", 100)
 score_font = pygame.font.Font("assets/fonts/squbitzplus.ttf", 40)
@@ -70,15 +55,16 @@ def draw_bg():
     screen.blit(scaled_bg, (0, 0))
 
 #Funcions for drawing fighter's health bar
-def draw_health_bar(health, x ,y):
-    ratio = health / 100
-    pygame.draw.rect(screen, BLACK, (x-2, y-2, 404, 34)) #rectangle outline
-    pygame.draw.rect(screen, WHITE, (x, y, 400, 30)) #rectangle bottom layer of health bar
-    pygame.draw.rect(screen, RED, (x, y, 400 * ratio, 30)) #rectangle top layer of health bar
+def draw_health_bar(health, max_health, x, y):
+    ratio = health / max_health
+    pygame.draw.rect(screen, BLACK, (x-2, y-2, 404, 34))  # outline
+    pygame.draw.rect(screen, WHITE, (x, y, 400, 30))      # background
+    pygame.draw.rect(screen, RED, (x, y, 400 * ratio, 30)) # fill
+
 
 #Create two instances of fighters
-fighter_1 = Fighter(1, 300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS, punch_fx, kunai_fx)
-fighter_2 = Fighter(2, 1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS, punch_fx, kunai_fx)
+fighter_1 = Fighter("naruto", 1, 300, 620, False, punch_fx, kunai_fx)
+fighter_2 = Fighter("sasuke", 2, 1100, 620, True, punch_fx, kunai_fx)
 
 #Game loop
 run = True
@@ -88,8 +74,8 @@ while run:
     #Draw background
     draw_bg()
     #Show player's stats
-    draw_health_bar(fighter_1.health, 100 , 50)
-    draw_health_bar(fighter_2.health, 900 , 50)
+    draw_health_bar(fighter_1.health, fighter_1.data["health"], 100, 50)
+    draw_health_bar(fighter_2.health, fighter_2.data["health"], 900, 50)
     draw_text("Player 1: "+ str(score[0]), score_font, RED, 100, 100)
     draw_text("Player 2: "+ str(score[1]), score_font, RED, 900, 100)
 
@@ -130,8 +116,8 @@ while run:
         if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
             round_over = False
             intro_count = 3
-            fighter_1 = Fighter(1, 300, 620, False, NARUTO_DATA, naruto_sheet, NARUTO_ANIMATED_STEPS, punch_fx, kunai_fx)
-            fighter_2 = Fighter(2, 1100, 620, True, SASUKE_DATA, sasuke_sheet, SASUKE_ANIMATED_STEPS, punch_fx, kunai_fx)
+            fighter_1 = Fighter("naruto", 1, 300, 620, False, punch_fx, kunai_fx)
+            fighter_2 = Fighter("sasuke", 2, 1100, 620, True, punch_fx, kunai_fx)
 
     #Event handler
     for event in pygame.event.get():

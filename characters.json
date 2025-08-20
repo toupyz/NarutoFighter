@@ -1,0 +1,35 @@
+{
+  "naruto": {
+    "name": "Naruto",
+    "health": 100,
+    "punch_damage": 15,
+    "throw_damage": 7,
+    "sprite_sheet": "assets/images/naruto/naruto.png",
+    "size": 162,
+    "scale": 3,
+    "offset": [70, 39],
+    "animation_steps": [4,6,4,3,3,3,14]
+  },
+  "sasuke": {
+    "name": "Sasuke",
+    "health": 90,
+    "punch_damage": 18,
+    "throw_damage": 10,
+    "sprite_sheet": "assets/images/sasuke/sasuke.png",
+    "size": 162,
+    "scale": 3,
+    "offset": [70, 39],
+    "animation_steps": [4,6,4,3,3,2,12]
+  },
+  "sakura": {
+    "name": "Sakura",
+    "health": 110,
+    "punch_damage": 12,
+    "throw_damage": 8,
+    "sprite_sheet": "assets/images/sakura.png",
+    "size": 162,
+    "scale": 3,
+    "offset": [70, 39],
+    "animation_steps": [4,6,4,3,3,2,12]
+  }
+}
