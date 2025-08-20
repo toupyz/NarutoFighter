@@ -24,7 +24,7 @@ BLACK = (0,0,0)
 #Define game variables
 intro_count = 3
 last_count_update = pygame.time.get_ticks()
-score = [0,0] #Player scores: [player1, player2
+score = [0,0] #Player scores: [player1, player2]
 round_over = False
 ROUND_OVER_COOLDOWN = 2000 #2 seconds
 
@@ -60,6 +60,7 @@ def draw_health_bar(health, max_health, x, y):
     pygame.draw.rect(screen, BLACK, (x-2, y-2, 404, 34))  # outline
     pygame.draw.rect(screen, WHITE, (x, y, 400, 30))      # background
     pygame.draw.rect(screen, RED, (x, y, 400 * ratio, 30)) # fill
+    draw_text(str(health) + "/" + str(max_health), score_font, BLACK, x, y)
 
 
 #Create two instances of fighters
