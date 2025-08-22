@@ -241,33 +241,33 @@ class Fighter():
 class Projectile():
     def __init__(self, x, y, direction, image, throw_damage):
         self.image_original = image
-        # Flip image if direction is left
+        #Flip image if direction is left
         if direction == -1:
             self.image = pygame.transform.flip(image, True, False)
         else:
             self.image = image
         self.rect = self.image.get_rect(center=(x, y))
         self.direction = direction
-        # Physics
+        #Physics
         self.vel_x = 12 * direction
-        self.vel_y = -10   # initial upward arc -10
+        self.vel_y = -10   #Initial upward arc -10
         self.gravity = 0.5
         self.alive = True
         self.throw_damage = throw_damage
 
     def update(self, screen, target):
-        # Apply physics
+        #Apply physics
         self.rect.x += self.vel_x
         self.rect.y += self.vel_y
         self.vel_y += self.gravity
-        # Draw
+        #Draw
         screen.blit(self.image, self.rect)
-        # Check hit
+        #Check hit
         if self.rect.colliderect(target.rect):
             target.health -= self.throw_damage #Damage
             target.hit = True
             self.alive = False
-        # Remove if off-screen
+        #Remove if off-screen
         if (self.rect.top > screen.get_height() or 
             self.rect.right < 0 or 
             self.rect.left > screen.get_width()):

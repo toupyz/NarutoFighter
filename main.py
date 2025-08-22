@@ -22,11 +22,14 @@ WHITE = (255,255,255)
 BLACK = (0,0,0)
 
 #Define game variables
+round_time = 30000 #3 mins
+round_time_left = round_time
 intro_count = 3
 last_count_update = pygame.time.get_ticks()
 score = [0,0] #Player scores: [player1, player2]
 round_over = False
-ROUND_OVER_COOLDOWN = 2000 #2 seconds
+ROUND_OVER_COOLDOWN = 2000 #Time after death, 2 seconds
+winner_text = ""
 
 #Load music/sounds
 pygame.mixer.music.load("assets/audio/silhouette.mp3")
@@ -70,7 +73,8 @@ fighter_2 = Fighter("sasuke", 2, 1100, 620, True, punch_fx, kunai_fx)
 #Game loop
 run = True
 while run:
-    clock.tick(FPS)
+    #clock.tick(FPS)
+    dt = clock.tick(FPS)  # milliseconds since last frame
 
     #Draw background
     draw_bg()
@@ -80,18 +84,36 @@ while run:
     draw_text("Player 1: "+ str(score[0]), score_font, RED, 100, 100)
     draw_text("Player 2: "+ str(score[1]), score_font, RED, 900, 100)
 
-    #Update count down
-    if intro_count <= 0:
+    # Countdown intro
+    if intro_count <= 0 and not round_over:
         #Move fighters
         fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
         fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
     else:
-        #Display count timer
-        draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH/2, SCREEN_HEIGHT/3)
-        #Update count timer
-        if (pygame.time.get_ticks() - last_count_update) >= 1000:
-            intro_count -= 1
-            last_count_update = pygame.time.get_ticks()
+        if intro_count > 0:  # show countdown before match
+            draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH/2, SCREEN_HEIGHT/3)
+            if (pygame.time.get_ticks() - last_count_update) >= 1000:
+                intro_count -= 1
+                last_count_update = pygame.time.get_ticks()
+
+    # Update round timer only if round not finished
+    if not round_over and intro_count <= 0:
+        round_time_left -= dt
+        if round_time_left <= 0:
+            round_over = True
+            round_time_left = 0
+            if score[0] > score[1]:
+                winner_text = "Player 1 Wins!"
+            elif score[1] > score[0]:
+                winner_text = "Player 2 Wins!"
+            else:
+                winner_text = "Draw!"
+
+    # Draw round timer
+    seconds_left = round_time_left // 1000
+    minutes = seconds_left // 60
+    seconds = seconds_left % 60
+    draw_text(f"{minutes:01}:{seconds:02}", score_font, RED, SCREEN_WIDTH // 2 - 40, 50)
 
     #Update fighters
     fighter_1.update()
@@ -104,23 +126,28 @@ while run:
     fighter_2.draw(screen)
 
     #Check for player defeat
-    if round_over == False:
-        if fighter_1.alive == False: #If player 1 dies
-            score[1] += 1 #Player 2 points increase
-            fighter_2.is_winner = True   # ✅ Player 2 victory pose
+    if not round_over:
+        if not fighter_1.alive: #If player 1 dies
+            score[1] += 1
+            fighter_2.is_winner = True
             round_over = True
             round_over_time = pygame.time.get_ticks()
-        elif fighter_2.alive == False: #If player 2 dies
-            score[0] += 1 #Player 1 points increase
-            fighter_1.is_winner = True   # ✅ Player 1 victory pose
+        elif not fighter_2.alive: #If player 2 dies
+            score[0] += 1
+            fighter_1.is_winner = True
             round_over = True
             round_over_time = pygame.time.get_ticks()
     else:
-        if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
+        # Respawn only if the round_time isn't over
+        if round_time_left > 0 and pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
             round_over = False
             intro_count = 3
             fighter_1 = Fighter("naruto", 1, 300, 620, False, punch_fx, kunai_fx)
             fighter_2 = Fighter("sasuke", 2, 1100, 620, True, punch_fx, kunai_fx)
+
+    # Show winner if round timer ended
+    if round_time_left <= 0:
+        draw_text(winner_text, count_font, RED, SCREEN_WIDTH//2 - 250, SCREEN_HEIGHT//2)
 
     #Event handler
     for event in pygame.event.get():
@@ -128,8 +155,7 @@ while run:
             run = False
 
     #Update display
-    pygame.display.update()
-
+        pygame.display.update()
 
 #Exit pygame
 pygame.quit()
