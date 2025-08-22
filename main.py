@@ -107,10 +107,12 @@ while run:
     if round_over == False:
         if fighter_1.alive == False: #If player 1 dies
             score[1] += 1 #Player 2 points increase
+            fighter_2.is_winner = True   # ✅ Player 2 victory pose
             round_over = True
             round_over_time = pygame.time.get_ticks()
         elif fighter_2.alive == False: #If player 2 dies
             score[0] += 1 #Player 1 points increase
+            fighter_1.is_winner = True   # ✅ Player 1 victory pose
             round_over = True
             round_over_time = pygame.time.get_ticks()
     else:

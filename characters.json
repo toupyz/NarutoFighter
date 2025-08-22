@@ -8,7 +8,7 @@
     "size": 162,
     "scale": 3,
     "offset": [70, 39],
-    "animation_steps": [4,6,4,3,3,3,14]
+    "animation_steps": [4,6,4,3,3,2,5,11]
   },
   "sasuke": {
     "name": "Sasuke",
@@ -19,7 +19,7 @@
     "size": 162,
     "scale": 3,
     "offset": [70, 39],
-    "animation_steps": [4,6,4,3,3,2,12]
+    "animation_steps": [6,6,4,4,3,2,5,17]
   },
   "sakura": {
     "name": "Sakura",

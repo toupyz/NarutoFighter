@@ -13,7 +13,7 @@ class Fighter():
         self.data = character_data[char_id]
 
         self.alive = True
-        self.action = 0  # 0=idle, 1=run, 2=jump, 3=punch, 4=throwing, 5=hit, 6=death
+        self.action = 0  # 0=idle, 1=run, 2=jump, 3=phyical(punch,kick), 4=throwing, 5=hit, 6=death, 7=winning
         self.attack_cooldown = 0
         self.attacking = False
         self.attack_type = 0
@@ -38,7 +38,6 @@ class Fighter():
         self.running = False
         self.update_time = pygame.time.get_ticks()
         self.vel_y = 0  # y velocity
-
 
 
     def load_images(self, sprite_sheet, animation_steps):
@@ -107,8 +106,6 @@ class Fighter():
                         self.attack_type = 2
                     self.attack(surface, target, kunai_img)
 
-
-
         #Apply gravity
         self.vel_y += GRAVITY
         dy += self.vel_y
@@ -143,20 +140,25 @@ class Fighter():
         if self.health <= 0:
             self.health = 0
             self.alive = False
-            self.update_action(6) #death
-        elif self.hit == True:
-            self.update_action(5) #hit
-        elif self.attacking == True:
+            self.update_action(6)  # death
+        elif self.hit:
+            self.update_action(5)  # hit
+        elif self.attacking:
             if self.attack_type == 1:
-                self.update_action(3) #punch
+                self.update_action(3)  # punch
             elif self.attack_type == 2:
-                self.update_action(4) #throwing
-        elif self.jump == True:
-            self.update_action(2) #jumping
-        elif self.running == True:
-            self.update_action(1) #running
+                self.update_action(4)  # throw
+        elif self.jump:
+            self.update_action(2)  # jump
+        elif self.running:
+            self.update_action(1)  # run
         else:
-            self.update_action(0) #idle
+            # default to idle unless round_over happened
+            if getattr(self, "is_winner", False):
+                self.update_action(7)  # win pose
+            else:
+                self.update_action(0)  # idle
+
 
         animation_cooldown = 110 #miliseconds
         self.image = self.animation_list[self.action][self.frame_index]
